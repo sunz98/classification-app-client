@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "proxy": "http://localhost:8080",
   "dependencies": {
     "next": "13.5.2",
     "react": "18.2.0",

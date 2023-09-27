@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const styles = {
     container: {
@@ -54,13 +55,13 @@ export default function Survey({ surveyData }) {
         text: '3. 성별을 선택해주세요',
         inputType: 'radio',
         key: 'gender',
-        options: ['남성', '여성', '기타'],
+        options: ['MALE', 'FEMALE', 'OTHER'],
       },
       {
         number: 4,
         text: '4. 사용하는 프로그래밍 언어는 무엇인가요?',
         inputType: 'radio',
-        key: 'programmingLanguage',
+        key: 'language',
         options: ['JavaScript', 'Python', 'Java', 'C#', '기타'],
       },
       // 다른 질문들을 추가하세요
@@ -75,14 +76,20 @@ export default function Survey({ surveyData }) {
     };
   
     const handleSubmit = async () => {
-      try {
-        // 'answers' 상태 객체에서 모든 답변을 얻을 수 있습니다
-        await submitSurveyData(answers);
-        // 데이터 전송 후 성공 처리
-      } catch (error) {
-        console.error('설문 데이터 제출 중 오류 발생:', error);
-        // 오류 처리
-      }
+        try {
+            console.log(answers);
+            const response = await axios.post('http://localhost:8080/survey', answers);
+            if (response.status === 200) {
+                console.log('Survey data submitted successfully');
+                // You can add logic here to handle success
+            } else {
+                console.error('Failed to submit survey data');
+                // Handle the error as needed
+            }
+        } catch (error) {
+            console.error('An error occurred while submitting survey data:', error);
+            // Handle the error as needed
+        }
     };
   
     return (

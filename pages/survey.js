@@ -36,6 +36,8 @@ const styles = {
 export default function Survey({ surveyData }) {
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [answers, setAnswers] = useState({}); // 사용자 답변을 저장하는 상태
+    const [userSurvey, setUserSurvey] = useState([]);
+    // 사용자의 설문조사 결과를 리스트로 한 번 더 감싸기
   
     const questions = [
       {
@@ -72,13 +74,23 @@ export default function Survey({ surveyData }) {
     };
   
     const handleNextQuestion = () => {
-      setCurrentQuestion(currentQuestion + 1);
+      if (currentQuestion < questions.length - 1) {
+        setCurrentQuestion(currentQuestion + 1);
+      } else {
+        // 현재 설문 조사의 답변을 userSurvey 배열에 추가하고 초기화
+        setUserSurvey([...userSurvey, answers]);
+        setAnswers({});
+        setCurrentQuestion(0); // 처음 질문으로 돌아가거나 다음 설문 조사로 이동
+      }
     };
   
     const handleSubmit = async () => {
         try {
-            console.log(answers);
-            const response = await axios.post('http://localhost:8080/survey', answers);
+            // 현재 설문 조사 답변을 userSurvey배열에 추가
+            setUserSurvey([...userSurvey, answers]);
+
+            // userSurvey 배열 전체를 서버로 전송
+            const response = await axios.post('http://localhost:8080/survey', userSurvey);
             if (response.status === 200) {
                 console.log('Survey data submitted successfully');
                 // You can add logic here to handle success
@@ -127,7 +139,9 @@ export default function Survey({ surveyData }) {
           </div>
         ))}
         {currentQuestion < questions.length ? (
-          <button style={styles.button} onClick={handleNextQuestion}>다음</button>
+          <button style={styles.button} onClick={handleNextQuestion}>
+          {currentQuestion === questions.length - 1 ? '제출' : '다음'}
+          </button>
         ) : (
           <button style={styles.button} onClick={handleSubmit}>제출</button>
         )}

@@ -36,8 +36,6 @@ const styles = {
 export default function Survey({ surveyData }) {
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [answers, setAnswers] = useState({}); // 사용자 답변을 저장하는 상태
-    const [userSurvey, setUserSurvey] = useState([]);
-    // 사용자의 설문조사 결과를 리스트로 한 번 더 감싸기
   
     const questions = [
       {
@@ -77,31 +75,30 @@ export default function Survey({ surveyData }) {
       if (currentQuestion < questions.length - 1) {
         setCurrentQuestion(currentQuestion + 1);
       } else {
-        // 현재 설문 조사의 답변을 userSurvey 배열에 추가하고 초기화
-        setUserSurvey([...userSurvey, answers]);
-        setAnswers({});
-        setCurrentQuestion(0); // 처음 질문으로 돌아가거나 다음 설문 조사로 이동
+        // 현재 질문이 마지막 질문일 때만 handleSubmit 함수 호출
+        if (currentQuestion === questions.length - 1) {
+          handleSubmit();
+        }
       }
     };
+    
   
     const handleSubmit = async () => {
-        try {
-            // 현재 설문 조사 답변을 userSurvey배열에 추가
-            setUserSurvey([...userSurvey, answers]);
-
-            // userSurvey 배열 전체를 서버로 전송
-            const response = await axios.post('http://localhost:8080/survey', userSurvey);
-            if (response.status === 200) {
-                console.log('Survey data submitted successfully');
-                // You can add logic here to handle success
-            } else {
-                console.error('Failed to submit survey data');
-                // Handle the error as needed
-            }
-        } catch (error) {
-            console.error('An error occurred while submitting survey data:', error);
+      try {
+        const response = await axios.post('http://localhost:8080/survey', answers);
+        if (response.status === 200) {
+            console.log('Survey data submitted successfully');
+            // POST 요청이 성공하면 "제출 완료" 알림을 표시
+            alert('제출 완료');
+            // 또는 모달 또는 다른 방식으로 알림을 표시할 수 있습니다.
+        } else {
+            console.error('Failed to submit survey data');
             // Handle the error as needed
         }
+    } catch (error) {
+        console.error('An error occurred while submitting survey data:', error);
+        // Handle the error as needed
+    }
     };
   
     return (
